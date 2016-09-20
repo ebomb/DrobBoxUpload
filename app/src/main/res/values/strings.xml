@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">DropBoxUpload</string>
+    <string name="where_would_you_like_to_upload_your_image_file_to">Where would you like to upload your image file to?</string>
+    <string name="welcome">Welcome!</string>
+    <string name="dropbox">Dropbox</string>
+    <string name="box">Box</string>
 </resources>
