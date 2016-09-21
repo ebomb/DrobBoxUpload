@@ -9,7 +9,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.demo.dropboxupload.UploadActivity">
+    tools:context="com.demo.dropboxupload.activities.UploadActivity">
 
     <!-- Welcome! -->
     <TextView
@@ -30,6 +30,7 @@
         android:textAlignment="center"
         android:textAppearance="@android:style/TextAppearance.DeviceDefault.Small" />
 
+    <!-- Dropbox or Box buttons -->
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -37,40 +38,41 @@
         android:layout_marginTop="16dp"
         android:orientation="horizontal">
 
-        <!-- Dropbox Button -->
+        <!-- Dropbox button & text -->
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:paddingEnd="32dp"
-            android:paddingRight="32dp"
             android:gravity="center_horizontal"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:paddingEnd="32dp"
+            android:paddingRight="32dp">
 
             <android.support.design.widget.FloatingActionButton
                 android:id="@+id/dropbox_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_dropbox"
+                android:onClick="onDropboxClick"
                 app:elevation="4dp" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:textStyle="bold"
-                android:text="@string/dropbox" />
+                android:text="@string/dropbox"
+                android:textStyle="bold" />
         </LinearLayout>
 
-        <!-- Upload to Box-->
+        <!-- Box buttons & text-->
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:paddingStart="32dp"
-            android:paddingLeft="32dp"
             android:gravity="center_horizontal"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:paddingLeft="32dp"
+            android:paddingStart="32dp">
 
             <android.support.design.widget.FloatingActionButton
                 android:id="@+id/box_button"
@@ -84,8 +86,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:textStyle="bold"
-                android:text="@string/box" />
+                android:text="@string/box"
+                android:textStyle="bold" />
         </LinearLayout>
 
     </LinearLayout>
