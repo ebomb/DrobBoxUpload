@@ -1,7 +1,6 @@
 package com.demo.dropboxupload.activities;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -11,28 +10,31 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import com.android.volley.RequestQueue;
 import com.demo.dropboxupload.R;
+import com.demo.dropboxupload.app.AndroidApplication;
 import com.demo.dropboxupload.models.DropboxApp;
 import com.demo.dropboxupload.models.translators.DropboxAppTranslator;
 import com.demo.dropboxupload.singletons.DropboxClientFactory;
 import com.demo.dropboxupload.utils.AppConstants;
 import com.demo.dropboxupload.utils.Preferences;
 import com.dropbox.core.DbxException;
-import com.dropbox.core.DbxRequestConfig;
 import com.dropbox.core.android.Auth;
 import com.dropbox.core.v2.DbxClientV2;
 import com.dropbox.core.v2.users.FullAccount;
 
+import javax.inject.Inject;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 
 public class UploadActivity extends AppCompatActivity {
 
     private static final String ACCESS_TOKEN = "fKcHFi7jw6AAAAAAAAAACDvz5Uw1Gx7StVu2GD0UojIJOUMRvKJvUCB9-kOoqXbw";
     DbxClientV2 client;
     FullAccount account;
-    Context mContext;
+    @Inject Context mContext;
+    @Inject RequestQueue mRequestQueue;
 
     @BindView(R.id.box_button) FloatingActionButton fab1;
     @BindView(R.id.dropbox_button) FloatingActionButton fab2;
@@ -41,8 +43,8 @@ public class UploadActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_upload);
+        ((AndroidApplication) getApplication()).getApplicationComponent().inject(this);
         ButterKnife.bind(this);
-        mContext = getApplicationContext();
     }
 
     @Override
