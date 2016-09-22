@@ -2,10 +2,12 @@ package com.demo.dropboxupload.activities;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Toast;
 
@@ -27,38 +29,46 @@ import javax.inject.Inject;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static com.demo.dropboxupload.utils.AppConstants.UPLOAD_TYPE_BOX;
+import static com.demo.dropboxupload.utils.AppConstants.UPLOAD_TYPE_DROPBOX;
+
 public class LandingActivity extends BaseActivity {
 
+    public static int UPLOAD_TYPE;
     FullAccount account;
 
-    @Inject Context mContext;
-    @Inject RequestQueue mRequestQueue;
 
-    @BindView(R.id.box_button) FloatingActionButton fab1;
-    @BindView(R.id.dropbox_button) FloatingActionButton fab2;
+    @Inject
+    Context mContext;
+    @Inject
+    RequestQueue mRequestQueue;
+
+    @BindView(R.id.box_button)
+    FloatingActionButton fab1;
+    @BindView(R.id.dropbox_button)
+    FloatingActionButton fab2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_upload);
-
-        // Inject dependencies
-        ((DemoApplication) getApplication()).component().inject(this);
-
-        // Bind Views
-        ButterKnife.bind(this);
+        ((DemoApplication) getApplication()).component().inject(this);  // Inject dependencies
+        ButterKnife.bind(this);     // Bind Views
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        String accessToken = getDropboxAccessToken();
-        if (!TextUtils.isEmpty(accessToken)) {
-            Toast.makeText(mContext, "AUTH SUCCESS!", Toast.LENGTH_LONG).show();
-            DropboxClientFactory.init(accessToken);
-
-            // Get current account info
-            new GetDropboxAccount().execute(DropboxClientFactory.getClient());
+        switch (UPLOAD_TYPE) {
+            case UPLOAD_TYPE_DROPBOX:
+                String accessToken = getDropboxAccessToken();
+                if (!TextUtils.isEmpty(accessToken)) {
+                    DropboxClientFactory.init(accessToken);
+                    startActivity(FilesActivity.getIntent(LandingActivity.this, "", UPLOAD_TYPE));
+                }
+                break;
+            case UPLOAD_TYPE_BOX:
+                break;
         }
     }
 
@@ -77,12 +87,13 @@ public class LandingActivity extends BaseActivity {
      * Performs click action for Dropbox option.
      * Checks if user has given auth already. Once auth is given, launch file picker.
      */
-    public void onDropboxClick(View view) {
+    public void onDropboxClick(@Nullable View view) {
+        UPLOAD_TYPE = UPLOAD_TYPE_DROPBOX;
         if (!TextUtils.isEmpty(getDropboxAccessToken())) {
-            // Auth was given already, we now open the Photo Library to choose file
-            startActivity(FilesActivity.getIntent(LandingActivity.this, ""));
+            // SUCCESSFUL AUTH
+            startActivity(FilesActivity.getIntent(LandingActivity.this, "", UPLOAD_TYPE));
         } else {
-            // Begin auth process through Dropbox
+            // START AUTH
             DropboxApp dropboxApp = DropboxAppTranslator.getDropboxAppDetails(mContext);    // Get App key
             if (dropboxApp != null && !TextUtils.isEmpty(dropboxApp.getAppKey())) {
                 Auth.startOAuth2Authentication(this, dropboxApp.getAppKey());               // Begin Auth

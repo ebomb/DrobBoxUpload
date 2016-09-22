@@ -7,4 +7,6 @@ package com.demo.dropboxupload.utils;
 
 public interface AppConstants {
     String KEY_DROPBOX_TOKEN = "dropbox_access_token";
+    int UPLOAD_TYPE_DROPBOX = 1;
+    int UPLOAD_TYPE_BOX = 2;
 }

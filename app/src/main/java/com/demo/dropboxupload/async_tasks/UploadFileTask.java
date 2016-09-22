@@ -1,6 +1,5 @@
 package com.demo.dropboxupload.async_tasks;
 
-import android.content.Context;
 import android.os.AsyncTask;
 
 import com.dropbox.core.DbxException;
@@ -20,9 +19,9 @@ import java.io.InputStream;
 
 public class UploadFileTask extends AsyncTask<String, Void, FileMetadata> {
 
-    private final Context mContext;
-    private final DbxClientV2 mDbxClient;
+    private DbxClientV2 mDropboxClient = null;
     private final Callback mCallback;
+    private Object mObject = null;
     private Exception mException;
 
     public interface Callback {
@@ -30,10 +29,44 @@ public class UploadFileTask extends AsyncTask<String, Void, FileMetadata> {
         void onError(Exception e);
     }
 
-    public UploadFileTask(Context context, DbxClientV2 dbxClient, Callback callback) {
-        mContext = context;
-        mDbxClient = dbxClient;
+    // Constructor for Dropbox
+    public UploadFileTask(DbxClientV2 dbxClient, Callback callback) {
+        mDropboxClient = dbxClient;
         mCallback = callback;
+    }
+
+    // Constructor for Box
+    public UploadFileTask(Object object, Callback callback) {
+        mObject = object;
+        mCallback = callback;
+    }
+
+    @Override
+    protected FileMetadata doInBackground(String... params) {
+        // Get Image File
+        String filePath = params[0];
+        File localFile = new File(filePath);
+
+        // Get File Path & Name
+        String remoteFolderPath = params[1];
+        String remoteFileName = localFile.getName();
+
+        // Perform Upload Action
+        try (InputStream inputStream = new FileInputStream(localFile)) {
+            if (mDropboxClient != null) {
+                // DROPBOX
+                return mDropboxClient.files()
+                        .uploadBuilder(remoteFolderPath + "/" + remoteFileName)
+                        .withMode(WriteMode.OVERWRITE)
+                        .uploadAndFinish(inputStream);
+            } else if (mObject != null) {
+                // BOX
+                // TODO: Box.com upload
+            }
+        } catch (DbxException | IOException e) {
+            mException = e;
+        }
+        return null;
     }
 
     @Override
@@ -46,28 +79,5 @@ public class UploadFileTask extends AsyncTask<String, Void, FileMetadata> {
         } else {
             mCallback.onUploadComplete(result);
         }
-    }
-
-    @Override
-    protected FileMetadata doInBackground(String... params) {
-        String filePath = params[0];
-        File localFile = new File(filePath);
-
-        if (localFile != null) {
-            String remoteFolderPath = params[1];
-
-            // Note - this is not ensuring the name is a valid dropbox file name
-            String remoteFileName = localFile.getName();
-
-            try (InputStream inputStream = new FileInputStream(localFile)) {
-                return mDbxClient.files().uploadBuilder(remoteFolderPath + "/" + remoteFileName)
-                        .withMode(WriteMode.OVERWRITE)
-                        .uploadAndFinish(inputStream);
-            } catch (DbxException | IOException e) {
-                mException = e;
-            }
-        }
-
-        return null;
     }
 }
