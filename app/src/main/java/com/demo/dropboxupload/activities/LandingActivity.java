@@ -5,16 +5,12 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.View;
-import android.widget.Toast;
 
 import com.demo.dropboxupload.R;
 import com.demo.dropboxupload.di.DemoApplication;
-import com.demo.dropboxupload.models.DropboxAppData;
-import com.demo.dropboxupload.models.translators.DropboxAppDataTranslator;
 import com.demo.dropboxupload.singletons.DropboxClientFactory;
 import com.demo.dropboxupload.utils.BoxAuth;
-import com.demo.dropboxupload.utils.Preferences;
-import com.dropbox.core.android.Auth;
+import com.demo.dropboxupload.utils.DropboxAuth;
 
 import javax.inject.Inject;
 
@@ -25,10 +21,10 @@ import static com.demo.dropboxupload.utils.AppConstants.UPLOAD_TYPE_DROPBOX;
 
 public class LandingActivity extends AppCompatActivity {
 
-    public static int UPLOAD_TYPE;
-    private static final String KEY_DROPBOX_TOKEN = "KEY_DROPBOX_TOKEN";
-
     @Inject Context mContext;
+
+    public static int UPLOAD_TYPE;
+    DropboxAuth mDropboxAuth = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,14 +32,15 @@ public class LandingActivity extends AppCompatActivity {
         setContentView(R.layout.activity_landing);
         ((DemoApplication) getApplication()).component().inject(this);  // Inject dependencies
         ButterKnife.bind(this);     // Bind Views
+        mDropboxAuth = null;
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         // Check if user is coming from giving dropbox auth
-        if (UPLOAD_TYPE == UPLOAD_TYPE_DROPBOX) {
-            String accessToken = getDropboxAccessToken();
+        if (mDropboxAuth != null && UPLOAD_TYPE == UPLOAD_TYPE_DROPBOX) {
+            String accessToken = mDropboxAuth.getDropboxAccessToken();
             if (!TextUtils.isEmpty(accessToken)) {
                 startFilesActivity(accessToken);
             }
@@ -56,20 +53,8 @@ public class LandingActivity extends AppCompatActivity {
      */
     public void onDropboxClick(View view) {
         UPLOAD_TYPE = UPLOAD_TYPE_DROPBOX;
-
-        // Check if user has given auth
-        String accessToken = getDropboxAccessToken();
-        if (!TextUtils.isEmpty(accessToken)) {
-            startFilesActivity(accessToken);
-        } else {
-            // START NEW AUTH
-            DropboxAppData dropboxAppData = DropboxAppDataTranslator.getDropboxAppDetails(mContext);    // Get App key
-            if (dropboxAppData != null && !TextUtils.isEmpty(dropboxAppData.getAppKey())) {
-                Auth.startOAuth2Authentication(this, dropboxAppData.getAppKey());               // Begin Auth
-            } else {
-                Toast.makeText(mContext, R.string.error_detecting_dropbox_app, Toast.LENGTH_LONG).show();
-            }
-        }
+        mDropboxAuth = DropboxAuth.createInstance(LandingActivity.this);
+        mDropboxAuth.checkOAuth();
     }
 
     /**
@@ -83,29 +68,15 @@ public class LandingActivity extends AppCompatActivity {
 
     // Starts up the activity that lets you choose your Image file
     public void startFilesActivity(String accessToken) {
-        String mFolderName = "0";
+        String mFolderName = "0";   // Needs to be "0" folder name for Box
 
         // Initiate Dropbox client object if necessary
         if (UPLOAD_TYPE == UPLOAD_TYPE_DROPBOX) {
             DropboxClientFactory.init(accessToken);
-            mFolderName = "";
+            mFolderName = "";   // Needs to be empty folder name for Dropbox
         }
 
         // Start Files Activity
         startActivity(FilesActivity.getIntent(LandingActivity.this, mFolderName, UPLOAD_TYPE));
-    }
-
-    /* Checks if access token has been saved before. If not, request Auth and save access token
-    *  This returns the saved access token
-    */
-    public String getDropboxAccessToken() {
-        String accessToken = Preferences.getPreference(KEY_DROPBOX_TOKEN, mContext, "");
-        if (TextUtils.isEmpty(accessToken)) {
-            accessToken = Auth.getOAuth2Token();
-            if (accessToken != null) {
-                Preferences.setPreference(KEY_DROPBOX_TOKEN, accessToken, mContext);
-            }
-        }
-        return accessToken;
     }
 }

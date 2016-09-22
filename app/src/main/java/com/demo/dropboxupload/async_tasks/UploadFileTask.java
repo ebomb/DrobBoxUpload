@@ -3,7 +3,6 @@ package com.demo.dropboxupload.async_tasks;
 import android.annotation.TargetApi;
 import android.os.AsyncTask;
 import android.os.Build;
-import android.util.Log;
 
 import com.box.androidsdk.content.BoxApiFile;
 import com.box.androidsdk.content.BoxException;

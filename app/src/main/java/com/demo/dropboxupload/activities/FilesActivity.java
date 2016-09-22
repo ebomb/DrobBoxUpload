@@ -3,6 +3,7 @@ package com.demo.dropboxupload.activities;
 import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
@@ -160,6 +161,12 @@ public class FilesActivity extends AppCompatActivity {
         dialog.setCancelable(true);
         dialog.setMessage(message);
         dialog.show();
+        dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                exitActivity();
+            }
+        });
     }
 
     // Creates the launching intent for this Activity
@@ -173,7 +180,9 @@ public class FilesActivity extends AppCompatActivity {
     // Safely exits out of this Activity
     private void exitActivity() {
         LandingActivity.UPLOAD_TYPE = -1;
-        finish();
+        if (!isFinishing()) {
+            finish();
+        }
     }
 
     // Checks if user has permission for specified file action
