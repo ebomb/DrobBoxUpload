@@ -27,7 +27,7 @@ import javax.inject.Inject;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class UploadActivity extends BaseActivity {
+public class LandingActivity extends BaseActivity {
 
     FullAccount account;
 
@@ -41,7 +41,11 @@ public class UploadActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_upload);
+
+        // Inject dependencies
         ((DemoApplication) getApplication()).component().inject(this);
+
+        // Bind Views
         ButterKnife.bind(this);
     }
 
@@ -76,7 +80,7 @@ public class UploadActivity extends BaseActivity {
     public void onDropboxClick(View view) {
         if (!TextUtils.isEmpty(getDropboxAccessToken())) {
             // Auth was given already, we now open the Photo Library to choose file
-            startActivity(FilePickerActivity.getIntent(UploadActivity.this, ""));
+            startActivity(FilesActivity.getIntent(LandingActivity.this, ""));
         } else {
             // Begin auth process through Dropbox
             DropboxApp dropboxApp = DropboxAppTranslator.getDropboxAppDetails(mContext);    // Get App key

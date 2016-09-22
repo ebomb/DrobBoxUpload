@@ -1,7 +1,8 @@
 package com.demo.dropboxupload.di;
 
 import com.demo.dropboxupload.activities.BaseActivity;
-import com.demo.dropboxupload.activities.UploadActivity;
+import com.demo.dropboxupload.activities.FilesActivity;
+import com.demo.dropboxupload.activities.LandingActivity;
 
 import javax.inject.Singleton;
 
@@ -16,7 +17,9 @@ import dagger.Component;
 public interface ApplicationComponent {
     void inject(DemoApplication application);
 
-    void inject(UploadActivity homeActivity);
+    void inject(LandingActivity homeActivity);
 
     void inject(BaseActivity baseActivity);
+
+    void inject(FilesActivity filesActivity);
 }
