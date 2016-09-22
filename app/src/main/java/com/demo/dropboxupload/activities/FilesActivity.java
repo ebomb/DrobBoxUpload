@@ -20,8 +20,6 @@ import com.demo.dropboxupload.singletons.DropboxClientFactory;
 import com.demo.dropboxupload.utils.FileUtils;
 import com.dropbox.core.v2.files.FileMetadata;
 
-import java.text.DateFormat;
-
 import javax.inject.Inject;
 
 import static com.demo.dropboxupload.utils.AppConstants.UPLOAD_TYPE_BOX;
@@ -104,9 +102,8 @@ public class FilesActivity extends AppCompatActivity {
         launchFilePicker();
     }
 
+    // Performs the upload action to Dropbox
     private void uploadDropboxFile(String filePath) {
-        Log.e("PATH", filePath);
-
         // Display Uploading Message
         final ProgressDialog dialog = new ProgressDialog(this);
         dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
@@ -119,18 +116,18 @@ public class FilesActivity extends AppCompatActivity {
             @Override
             public void onUploadComplete(FileMetadata result) {
                 dialog.dismiss();
-                String message = result.getName() + " size " + result.getSize() + " modified " +
-                        DateFormat.getDateTimeInstance().format(result.getClientModified());
-                Log.e("Success", message);
-                Toast.makeText(mContext, "Uploaded", Toast.LENGTH_SHORT).show();
+//                String message = result.getName() + " size " + result.getSize() + " modified " +
+//                        DateFormat.getDateTimeInstance().format(result.getClientModified());
+//                Log.d("Success", message);
+                Toast.makeText(mContext, R.string.uploaded, Toast.LENGTH_SHORT).show();
                 exitActivity();
             }
 
             @Override
             public void onError(Exception e) {
                 dialog.dismiss();
-                Log.e("ERROR!", "Failed to upload file " + e);
-                Toast.makeText(mContext, "An error has occurred", Toast.LENGTH_SHORT).show();
+//                Log.d("ERROR!", "Failed to upload file " + e);
+                Toast.makeText(mContext, R.string.error_has_occurred, Toast.LENGTH_SHORT).show();
                 exitActivity();
             }
         }).execute(filePath, mPath);

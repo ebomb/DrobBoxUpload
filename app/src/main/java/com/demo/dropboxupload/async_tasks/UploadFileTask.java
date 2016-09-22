@@ -24,6 +24,7 @@ public class UploadFileTask extends AsyncTask<String, Void, FileMetadata> {
     private Object mObject = null;
     private Exception mException;
 
+    // Handles callback from upload action
     public interface Callback {
         void onUploadComplete(FileMetadata result);
         void onError(Exception e);

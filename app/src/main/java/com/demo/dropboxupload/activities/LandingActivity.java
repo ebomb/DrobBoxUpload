@@ -91,11 +91,13 @@ public class LandingActivity extends BaseActivity {
         BoxOAuthDialog dialog = new BoxOAuthDialog(LandingActivity.this, mBoxAppData, new BoxOAuthDialog.BoxAuthCallback() {
             @Override
             public void onComplete(String authCode) {
+                // User Granted Access to Box
                 Log.e("AUTHCODE", authCode);
             }
 
             @Override
             public void onError(String errorMessage) {
+                // Error occured while requesting access to Box
                 if (!TextUtils.isEmpty(errorMessage)) {
                     Log.e("ERRORCODE", errorMessage);
                     Toast.makeText(mContext, errorMessage, Toast.LENGTH_LONG).show();
