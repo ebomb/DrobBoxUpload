@@ -46,14 +46,10 @@ public class BoxAuth implements BoxAuthentication.AuthListener {
 
     @Override
     public void onAuthCreated(BoxAuthentication.BoxAuthenticationInfo info) {
-        // Store refresh token
-        Preferences.setPreference(AppConstants.KEY_BOX_REFRESH_TOKEN, info.refreshToken(), mParentActivity);
-
-        // Set Box's File API to create file requests
-//        BoxApiFileClientFactory.init(mBoxSession);
-
         // Start the Box upload process
-        mParentActivity.startFilesActivity(info.accessToken());
+        if (info != null) {
+            mParentActivity.startFilesActivity(info.accessToken());
+        }
     }
 
     @Override

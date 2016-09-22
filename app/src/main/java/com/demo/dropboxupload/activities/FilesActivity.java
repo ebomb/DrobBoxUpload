@@ -95,7 +95,7 @@ public class FilesActivity extends AppCompatActivity {
             }
         }
 
-        // AGREED PERMISSION
+        // USER GRANTED PERMISSION
         launchFilePicker();
     }
 
@@ -137,14 +137,18 @@ public class FilesActivity extends AppCompatActivity {
 
     // Display success message and exit out of this Activity
     private void handleSuccessfulUpload() {
-        dialog.dismiss();
+        if (dialog != null) {
+            dialog.dismiss();
+        }
         Toast.makeText(mContext, R.string.successfully_uploaded, Toast.LENGTH_LONG).show();
         exitActivity();
     }
 
     // Display error message and exit out of this Activity
     private void handleErrorUpload() {
-        dialog.dismiss();
+        if (dialog != null) {
+            dialog.dismiss();
+        }
         Toast.makeText(mContext, R.string.error_has_occurred, Toast.LENGTH_SHORT).show();
         exitActivity();
     }

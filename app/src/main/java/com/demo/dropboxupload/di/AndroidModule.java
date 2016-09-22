@@ -52,7 +52,7 @@ public class AndroidModule {
     BoxSession provideBoxSession(Context context) {
         final BoxAppData mBoxAppData = BoxAppDataTranslator.getBoxAppData(context);
         return new BoxSession(context,
-                "user_id",
+                "",
                 mBoxAppData.getClientID(),
                 mBoxAppData.getClientSecret(),
                 mBoxAppData.getRedirectURI());

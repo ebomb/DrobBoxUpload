@@ -73,6 +73,7 @@ public class UploadFileTask extends AsyncTask<String, Void, Void> {
 
     @Override
     protected void onPostExecute(Void result) {
+        super.onPostExecute(result);
         if (mException != null) {
             mCallback.onError(mException);
         } else {

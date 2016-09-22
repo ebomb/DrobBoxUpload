@@ -3,15 +3,14 @@ package com.demo.dropboxupload.activities;
 import android.content.Context;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
 import com.android.volley.RequestQueue;
 import com.demo.dropboxupload.R;
 import com.demo.dropboxupload.di.DemoApplication;
-import com.demo.dropboxupload.models.BoxAppData;
 import com.demo.dropboxupload.models.DropboxAppData;
-import com.demo.dropboxupload.models.translators.BoxAppDataTranslator;
 import com.demo.dropboxupload.models.translators.DropboxAppDataTranslator;
 import com.demo.dropboxupload.singletons.DropboxClientFactory;
 import com.demo.dropboxupload.utils.AppConstants;
@@ -77,62 +76,22 @@ public class LandingActivity extends BaseActivity {
 
     /**
      * BOX UPLOAD: Performs click action for Box option.
-     * Checks if user has given auth already. Once auth is given, launch file picker.
+     * Starts up the OAuth process
      */
     public void onBoxClick(View view) {
         UPLOAD_TYPE = UPLOAD_TYPE_BOX;
-
-        // Begin OAuth Process
         BoxAuth.createInstance(LandingActivity.this).beginOAuth();
-
-/*
-        // Request Login and access to Box
-        BoxOAuthDialog dialog = new BoxOAuthDialog(LandingActivity.this, mBoxAppData, new BoxOAuthDialog.BoxAuthCallback() {
-            @Override
-            public void onComplete(String authCode) {
-                Log.e("AUTHCODE", authCode);
-
-                // EXCHANGE AUTH CODE FOR ACCESS TOKEN
-                BoxAPI.requestAccessToken(authCode, mBoxAppData, mContext, mRequestQueue, new BoxAccessTokenCallback() {
-                    @Override
-                    public void onComplete(BoxAccess boxAccess) {
-                        // Store access token and refresh token
-                        Preferences.setPreference(AppConstants.KEY_BOX_ACCESS_TOKEN, boxAccess.getAccessToken(), mContext);
-                        Preferences.setPreference(AppConstants.KEY_BOX_REFRESH_TOKEN, boxAccess.getAccessToken(), mContext);
-
-                        // Start the Box upload process
-                        startFilesActivity("");
-                    }
-
-                    @Override
-                    public void onError(String errorMessage) {
-                        showMessage(errorMessage);    // Error occurred while requesting access token
-                    }
-                });
-            }
-
-            @Override
-            public void onError(String errorMessage) {
-                showMessage(errorMessage);    // Error occurred while requesting access to Box
-
-            }
-        });
-        dialog.show();*/
-    }
-
-    public void showMessage(String message) {
-        if (!TextUtils.isEmpty(message)) {
-            Toast.makeText(mContext, message, Toast.LENGTH_LONG).show();
-        }
     }
 
     public void startFilesActivity(String accessToken) {
         // Initiate Dropbox client object if necessary
+        String mPath = "0";
         if (UPLOAD_TYPE == UPLOAD_TYPE_DROPBOX) {
             DropboxClientFactory.init(accessToken);
+            mPath = "";
         }
 
-        startActivity(FilesActivity.getIntent(LandingActivity.this, "0", UPLOAD_TYPE));
+        startActivity(FilesActivity.getIntent(LandingActivity.this, mPath, UPLOAD_TYPE));
     }
 
     public String getDropboxAccessToken() {
