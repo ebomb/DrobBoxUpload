@@ -3,14 +3,18 @@ package com.demo.dropboxupload.activities;
 import android.content.Context;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
 import com.android.volley.RequestQueue;
 import com.demo.dropboxupload.R;
 import com.demo.dropboxupload.di.DemoApplication;
-import com.demo.dropboxupload.models.DropboxApp;
-import com.demo.dropboxupload.models.translators.DropboxAppTranslator;
+import com.demo.dropboxupload.dialogs.BoxOAuthDialog;
+import com.demo.dropboxupload.models.BoxAppData;
+import com.demo.dropboxupload.models.DropboxAppData;
+import com.demo.dropboxupload.models.translators.BoxAppDataTranslator;
+import com.demo.dropboxupload.models.translators.DropboxAppDataTranslator;
 import com.demo.dropboxupload.singletons.DropboxClientFactory;
 import com.demo.dropboxupload.utils.AppConstants;
 import com.demo.dropboxupload.utils.Preferences;
@@ -68,9 +72,9 @@ public class LandingActivity extends BaseActivity {
             startFilesActivity(accessToken);
         } else {
             // START NEW AUTH
-            DropboxApp dropboxApp = DropboxAppTranslator.getDropboxAppDetails(mContext);    // Get App key
-            if (dropboxApp != null && !TextUtils.isEmpty(dropboxApp.getAppKey())) {
-                Auth.startOAuth2Authentication(this, dropboxApp.getAppKey());               // Begin Auth
+            DropboxAppData dropboxAppData = DropboxAppDataTranslator.getDropboxAppDetails(mContext);    // Get App key
+            if (dropboxAppData != null && !TextUtils.isEmpty(dropboxAppData.getAppKey())) {
+                Auth.startOAuth2Authentication(this, dropboxAppData.getAppKey());               // Begin Auth
             } else {
                 Toast.makeText(mContext, R.string.error_detecting_dropbox_app, Toast.LENGTH_LONG).show();
             }
@@ -83,8 +87,22 @@ public class LandingActivity extends BaseActivity {
      */
     public void onBoxClick(View view) {
         UPLOAD_TYPE = UPLOAD_TYPE_BOX;
+        final BoxAppData mBoxAppData = BoxAppDataTranslator.getBoxAppData(mContext);
+        BoxOAuthDialog dialog = new BoxOAuthDialog(LandingActivity.this, mBoxAppData, new BoxOAuthDialog.BoxAuthCallback() {
+            @Override
+            public void onComplete(String authCode) {
+                Log.e("AUTHCODE", authCode);
+            }
 
-
+            @Override
+            public void onError(String errorMessage) {
+                if (!TextUtils.isEmpty(errorMessage)) {
+                    Log.e("ERRORCODE", errorMessage);
+                    Toast.makeText(mContext, errorMessage, Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+        dialog.show();
     }
 
     private void startFilesActivity(String accessToken) {

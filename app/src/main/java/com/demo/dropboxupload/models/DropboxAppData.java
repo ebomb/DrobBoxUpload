@@ -4,7 +4,7 @@ package com.demo.dropboxupload.models;
  * Created by Eli on 9/20/2016.
  */
 
-public class DropboxApp {
+public class DropboxAppData {
     String appKey;
     String secretKey;
 

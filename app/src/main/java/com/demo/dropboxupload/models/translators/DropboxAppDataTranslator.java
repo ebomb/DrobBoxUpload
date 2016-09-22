@@ -2,7 +2,7 @@ package com.demo.dropboxupload.models.translators;
 
 import android.content.Context;
 
-import com.demo.dropboxupload.models.DropboxApp;
+import com.demo.dropboxupload.models.DropboxAppData;
 import com.demo.dropboxupload.utils.JSONHelper;
 
 import org.json.JSONObject;
@@ -14,18 +14,18 @@ import java.io.InputStream;
  * Created by Eli on 9/20/2016.
  */
 
-public class DropboxAppTranslator {
+public class DropboxAppDataTranslator {
 
-    public static DropboxApp getDropboxAppDetails(Context context) {
-        DropboxApp mDropboxApp = new DropboxApp();
+    public static DropboxAppData getDropboxAppDetails(Context context) {
+        DropboxAppData mDropboxAppData = new DropboxAppData();
         try {
             JSONObject obj = new JSONObject(loadJSONFromAsset(context));
-            mDropboxApp.setAppKey(JSONHelper.getString(obj, DropboxApp.Keys.APP_KEY));
-            mDropboxApp.setSecretKey(JSONHelper.getString(obj, DropboxApp.Keys.APP_SECRET));
+            mDropboxAppData.setAppKey(JSONHelper.getString(obj, DropboxAppData.Keys.APP_KEY));
+            mDropboxAppData.setSecretKey(JSONHelper.getString(obj, DropboxAppData.Keys.APP_SECRET));
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return mDropboxApp;
+        return mDropboxAppData;
     }
 
     private static String loadJSONFromAsset(Context context) {
