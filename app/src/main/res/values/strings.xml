@@ -5,4 +5,5 @@
     <string name="dropbox">Dropbox</string>
     <string name="box">Box</string>
     <string name="error_detecting_dropbox_app">Error detecting Dropbox developer app</string>
+    <string name="read_access_denied">Can\'t upload file: read access denied. Please grant storage permissions to use this functionality.</string>
 </resources>

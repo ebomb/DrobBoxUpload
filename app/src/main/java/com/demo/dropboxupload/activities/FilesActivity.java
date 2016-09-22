@@ -3,13 +3,11 @@ package com.demo.dropboxupload.activities;
 import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -48,6 +46,23 @@ public class FilesActivity extends AppCompatActivity {
         performWithPermissions(FileAction.UPLOAD);
     }
 
+    // Checks if we need to ask for permissions for read access
+    private void performWithPermissions(final FileAction action) {
+        if (hasPermissionsForAction(action)) {
+            launchFilePicker();
+        } else {
+            requestPermissionsForAction(action);
+        }
+    }
+
+    // Launch intent to pick file for upload
+    private void launchFilePicker() {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("image/*");
+        startActivityForResult(intent, PICKFILE_REQUEST_CODE);
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, final Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -62,10 +77,10 @@ public class FilesActivity extends AppCompatActivity {
                         uploadBoxFile(filePath);
                         break;
                     default:
-                        finish();
+                        exitActivity();
                 }
             } else {
-                finish();
+                exitActivity();
             }
         }
     }
@@ -79,12 +94,9 @@ public class FilesActivity extends AppCompatActivity {
         // CHECK IF USER HAS GIVEN AUTH
         for (int i = 0; i < grantResults.length; ++i) {
             if (grantResults[i] == PackageManager.PERMISSION_DENIED) {
-                Toast.makeText(this,
-                        "Can't upload file: read access denied. Please grant storage permissions to use this functionality.",
-                        Toast.LENGTH_LONG).show();
-                Log.d("PERMISSION RESULT", "User denied " + permissions[i] + " permission to perform file action");
+                Toast.makeText(this, R.string.read_access_denied, Toast.LENGTH_LONG).show();
                 exitActivity();
-               return;
+                return;
             }
         }
 
@@ -124,14 +136,6 @@ public class FilesActivity extends AppCompatActivity {
         }).execute(filePath, mPath);
     }
 
-    // Launch intent to pick file for upload
-    private void launchFilePicker() {
-        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-        intent.addCategory(Intent.CATEGORY_OPENABLE);
-        intent.setType("image/*");
-        startActivityForResult(intent, PICKFILE_REQUEST_CODE);
-    }
-
     // Creates the launching intent for this Activity
     public static Intent getIntent(Context context, String path, int uploadType) {
         Intent filesIntent = new Intent(context, FilesActivity.class);
@@ -140,46 +144,13 @@ public class FilesActivity extends AppCompatActivity {
         return filesIntent;
     }
 
-    // Checks if we need to ask for permissions for read access
-    private void performWithPermissions(final FileAction action) {
-
-        // App has permissions
-        if (hasPermissionsForAction(action)) {
-            launchFilePicker();
-            return;
-        }
-
-        if (shouldDisplayRationaleForAction(action)) {
-            new AlertDialog.Builder(this)
-                    .setMessage("This app requires storage access to upload files.")
-                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            requestPermissionsForAction(action);
-                        }
-                    })
-                    .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            Toast.makeText(mContext,
-                                    "Can't upload file: read access denied. Please grant storage permissions to use this functionality.",
-                                    Toast.LENGTH_LONG).show();
-                            exitActivity();
-                        }
-                    })
-                    .create()
-                    .show();
-        } else {
-            requestPermissionsForAction(action);
-        }
-    }
-
     // Safely exits out of this Activity
     private void exitActivity() {
         LandingActivity.UPLOAD_TYPE = -1;
         finish();
     }
 
+    // Checks if user has permission for specified file action
     private boolean hasPermissionsForAction(FileAction action) {
         for (String permission : action.getPermissions()) {
             int result = ContextCompat.checkSelfPermission(this, permission);
@@ -190,15 +161,7 @@ public class FilesActivity extends AppCompatActivity {
         return true;
     }
 
-    private boolean shouldDisplayRationaleForAction(FileAction action) {
-        for (String permission : action.getPermissions()) {
-            if (!ActivityCompat.shouldShowRequestPermissionRationale(this, permission)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
+    // Requests permissions for specified file actions
     private void requestPermissionsForAction(FileAction action) {
         ActivityCompat.requestPermissions(this, action.getPermissions(), action.getCode());
     }
@@ -206,8 +169,6 @@ public class FilesActivity extends AppCompatActivity {
     private enum FileAction {
         //DOWNLOAD(Manifest.permission.WRITE_EXTERNAL_STORAGE),
         UPLOAD(Manifest.permission.READ_EXTERNAL_STORAGE);
-
-        private static final FileAction[] values = values();
 
         private final String[] permissions;
 
@@ -221,13 +182,6 @@ public class FilesActivity extends AppCompatActivity {
 
         public String[] getPermissions() {
             return permissions;
-        }
-
-        public static FileAction fromCode(int code) {
-            if (code < 0 || code >= values.length) {
-                throw new IllegalArgumentException("Invalid FileAction code: " + code);
-            }
-            return values[code];
         }
     }
 }
