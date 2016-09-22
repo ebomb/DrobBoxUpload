@@ -2,8 +2,6 @@ package com.demo.dropboxupload.di;
 
 import android.content.Context;
 
-import com.android.volley.RequestQueue;
-import com.android.volley.toolbox.Volley;
 import com.box.androidsdk.content.BoxApiFile;
 import com.box.androidsdk.content.models.BoxSession;
 import com.demo.dropboxupload.models.BoxAppData;
@@ -16,13 +14,14 @@ import dagger.Provides;
 
 /**
  * Created by Eli on 9/21/2016.
+ * Module to manage my inject dependencies
  */
 
 @Module
-public class AndroidModule {
+class AndroidModule {
     private final DemoApplication application;
 
-    public AndroidModule(DemoApplication application) {
+    AndroidModule(DemoApplication application) {
         this.application = application;
     }
 
@@ -33,15 +32,6 @@ public class AndroidModule {
     @Singleton
     Context provideApplicationContext() {
         return application;
-    }
-
-    /**
-     * Allow Volley's RequestQueue to be injected.
-     */
-    @Provides
-    @Singleton
-    RequestQueue provideRequestQueue(Context context) {
-        return Volley.newRequestQueue(context);
     }
 
     /**

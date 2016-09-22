@@ -31,15 +31,14 @@ public class BoxAuth implements BoxAuthentication.AuthListener {
     }
 
     private BoxAuth editContext(LandingActivity parentActivity) {
-        ((DemoApplication) parentActivity.getApplication()).component().inject(this);  // Inject dependencies
+        // Inject dependencies
+        ((DemoApplication) parentActivity.getApplication()).component().inject(this);
         this.mParentActivity = parentActivity;
         return this;
     }
 
     // Begins the OAuth Process
     public void beginOAuth() {
-//        BoxSessionClientFactory.init(mBoxAppData, mParentActivity);
-//        mBoxSession = BoxSessionClientFactory.getClient();
         mBoxSession.setSessionAuthListener(this);
         mBoxSession.authenticate();
     }
@@ -60,7 +59,6 @@ public class BoxAuth implements BoxAuthentication.AuthListener {
 
     @Override
     public void onLoggedOut(BoxAuthentication.BoxAuthenticationInfo info, Exception ex) {
-        Toast.makeText(mParentActivity, "Logged Out", Toast.LENGTH_LONG).show();
         beginOAuth();
     }
 

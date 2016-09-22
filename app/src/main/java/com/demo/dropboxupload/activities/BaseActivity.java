@@ -14,6 +14,6 @@ public abstract class BaseActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // Perform injection so that when this call returns all dependencies will be available for use.
-        ((DemoApplication) getApplication()).component().inject(this);
+//        ((DemoApplication) getApplication()).component().inject(this);
     }
 }

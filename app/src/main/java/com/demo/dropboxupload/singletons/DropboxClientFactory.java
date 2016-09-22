@@ -5,7 +5,7 @@ import com.dropbox.core.v2.DbxClientV2;
 
 /**
  * Created by Eli on 9/21/2016.
- * Singleton instance of {@link DbxClientV2} and friends
+ * Singleton instance of {@link DbxClientV2}
  */
 
 public class DropboxClientFactory {

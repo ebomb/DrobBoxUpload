@@ -71,7 +71,6 @@ public class Preferences {
                 .getString(COOKIE_KEY, "");
     }
 
-
     public static void setPreference(String label, boolean key, Context context) {
         PreferenceManager
                 .getDefaultSharedPreferences(context)

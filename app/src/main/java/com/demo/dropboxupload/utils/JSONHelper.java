@@ -21,7 +21,7 @@ import java.util.Map;
 
 /**
  * Created by Eli on 9/20/2016.
- * A handy utility to help with JSON functions.
+ * A handy utility to tool to help with JSON parsing.
  */
 
 public class JSONHelper {

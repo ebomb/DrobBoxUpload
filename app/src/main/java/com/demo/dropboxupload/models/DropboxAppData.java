@@ -5,8 +5,8 @@ package com.demo.dropboxupload.models;
  */
 
 public class DropboxAppData {
-    String appKey;
-    String secretKey;
+    private String appKey;
+    private String secretKey;
 
     public String getAppKey() {
         return appKey;
