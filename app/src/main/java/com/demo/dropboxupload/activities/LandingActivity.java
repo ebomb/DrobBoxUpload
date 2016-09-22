@@ -83,16 +83,21 @@ public class LandingActivity extends AppCompatActivity {
 
     // Starts up the activity that lets you choose your Image file
     public void startFilesActivity(String accessToken) {
+        String mFolderName = "0";
+
         // Initiate Dropbox client object if necessary
-        String mPath = "0";
         if (UPLOAD_TYPE == UPLOAD_TYPE_DROPBOX) {
             DropboxClientFactory.init(accessToken);
-            mPath = "";
+            mFolderName = "";
         }
 
-        startActivity(FilesActivity.getIntent(LandingActivity.this, mPath, UPLOAD_TYPE));
+        // Start Files Activity
+        startActivity(FilesActivity.getIntent(LandingActivity.this, mFolderName, UPLOAD_TYPE));
     }
 
+    /* Checks if access token has been saved before. If not, request Auth and save access token
+    *  This returns the saved access token
+    */
     public String getDropboxAccessToken() {
         String accessToken = Preferences.getPreference(KEY_DROPBOX_TOKEN, mContext, "");
         if (TextUtils.isEmpty(accessToken)) {

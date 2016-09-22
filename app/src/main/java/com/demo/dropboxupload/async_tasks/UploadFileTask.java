@@ -1,6 +1,9 @@
 package com.demo.dropboxupload.async_tasks;
 
+import android.annotation.TargetApi;
 import android.os.AsyncTask;
+import android.os.Build;
+import android.util.Log;
 
 import com.box.androidsdk.content.BoxApiFile;
 import com.box.androidsdk.content.BoxException;
@@ -15,7 +18,7 @@ import java.io.InputStream;
 
 /**
  * Created by Eli on 9/21/2016.
- * Async Task that uploads file to specified server
+ * Async Task that uploads file to dropbox or box
  */
 
 public class UploadFileTask extends AsyncTask<String, Void, Void> {
@@ -45,6 +48,7 @@ public class UploadFileTask extends AsyncTask<String, Void, Void> {
         this.mCallback = callback;
     }
 
+    @TargetApi(Build.VERSION_CODES.KITKAT)
     @Override
     protected Void doInBackground(String... params) {
         // Get Image File

@@ -27,10 +27,10 @@ import static com.demo.dropboxupload.utils.AppConstants.UPLOAD_TYPE_DROPBOX;
 public class FilesActivity extends AppCompatActivity {
 
     private static final String EXTRA_PATH = "EXTRA_PATH", UPLOAD_TYPE = "UPLOAD_TYPE";
-    private static final int PICKFILE_REQUEST_CODE = 1;
+    private static final int PICKED_FILE_REQUEST_CODE = 1;
     ProgressDialog dialog;
     int uploadType;
-    String mPath;
+    String mFolderName;
 
     @Inject Context mContext;
     @Inject BoxApiFile mBoxApiFile;
@@ -40,7 +40,7 @@ public class FilesActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_file_picker);
         ((DemoApplication) getApplication()).component().inject(this);  // Inject dependencies
-        mPath = getIntent().getStringExtra(EXTRA_PATH);
+        mFolderName = getIntent().getStringExtra(EXTRA_PATH);
         uploadType = getIntent().getIntExtra(UPLOAD_TYPE, 0);
         performWithPermissions(FileAction.UPLOAD);
     }
@@ -59,13 +59,13 @@ public class FilesActivity extends AppCompatActivity {
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType("image/*");
-        startActivityForResult(intent, PICKFILE_REQUEST_CODE);
+        startActivityForResult(intent, PICKED_FILE_REQUEST_CODE);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, final Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == PICKFILE_REQUEST_CODE) {
+        if (requestCode == PICKED_FILE_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
                 String filePath = FileUtils.getFilePath(data.getData(), mContext);
                 switch (uploadType) {
@@ -86,7 +86,7 @@ public class FilesActivity extends AppCompatActivity {
 
     @Override
     public void onRequestPermissionsResult(int actionCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        // CHECK IF USER HAS GIVEN AUTH
+        // CHECK IF USER DENIED PERMISSION
         for (int grantResult : grantResults) {
             if (grantResult == PackageManager.PERMISSION_DENIED) {
                 Toast.makeText(this, R.string.read_access_denied, Toast.LENGTH_LONG).show();
@@ -114,7 +114,7 @@ public class FilesActivity extends AppCompatActivity {
             public void onError(Exception e) {
                 handleErrorUpload();
             }
-        }).execute(filePath, mPath);
+        }).execute(filePath, mFolderName);
     }
 
     // Performs the upload action to Dropbox
@@ -132,7 +132,7 @@ public class FilesActivity extends AppCompatActivity {
             public void onError(Exception e) {
                 handleErrorUpload();
             }
-        }).execute(filePath, mPath);
+        }).execute(filePath, mFolderName);
     }
 
     // Display success message and exit out of this Activity
@@ -157,7 +157,7 @@ public class FilesActivity extends AppCompatActivity {
     private void displayProgressDialog(String message) {
         dialog = new ProgressDialog(FilesActivity.this);
         dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        dialog.setCancelable(false);
+        dialog.setCancelable(true);
         dialog.setMessage(message);
         dialog.show();
     }
@@ -192,6 +192,7 @@ public class FilesActivity extends AppCompatActivity {
         ActivityCompat.requestPermissions(this, action.getPermissions(), action.getCode());
     }
 
+    // Enum to generalize action type (in case new features come in)
     private enum FileAction {
         //DOWNLOAD(Manifest.permission.WRITE_EXTERNAL_STORAGE),
         UPLOAD(Manifest.permission.READ_EXTERNAL_STORAGE);

@@ -11,6 +11,7 @@ import javax.inject.Inject;
 
 /**
  * Created by Eli on 9/22/2016.
+ * Class that handles Auth operations for Box.com
  */
 
 public class BoxAuth implements BoxAuthentication.AuthListener {
@@ -31,8 +32,7 @@ public class BoxAuth implements BoxAuthentication.AuthListener {
     }
 
     private BoxAuth editContext(LandingActivity parentActivity) {
-        // Inject dependencies
-        ((DemoApplication) parentActivity.getApplication()).component().inject(this);
+        ((DemoApplication) parentActivity.getApplication()).component().inject(this);   // Inject dependencies
         this.mParentActivity = parentActivity;
         return this;
     }

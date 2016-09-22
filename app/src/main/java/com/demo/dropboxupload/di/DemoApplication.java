@@ -3,7 +3,7 @@ package com.demo.dropboxupload.di;
 import android.app.Application;
 
 /**
- * Custom application definition.
+ * Custom application definition which initiates the component
  */
 public class DemoApplication extends Application {
 

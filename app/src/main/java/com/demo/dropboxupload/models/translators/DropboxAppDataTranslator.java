@@ -10,6 +10,7 @@ import org.json.JSONObject;
 
 /**
  * Created by Eli on 9/20/2016.
+ * Translator class that parses our dropbox client secrets.
  */
 
 public class DropboxAppDataTranslator {
