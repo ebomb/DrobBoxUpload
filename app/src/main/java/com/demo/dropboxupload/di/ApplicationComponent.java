@@ -3,6 +3,7 @@ package com.demo.dropboxupload.di;
 import com.demo.dropboxupload.activities.BaseActivity;
 import com.demo.dropboxupload.activities.FilesActivity;
 import com.demo.dropboxupload.activities.LandingActivity;
+import com.demo.dropboxupload.utils.BoxAuth;
 
 import javax.inject.Singleton;
 
@@ -22,4 +23,6 @@ public interface ApplicationComponent {
     void inject(BaseActivity baseActivity);
 
     void inject(FilesActivity filesActivity);
+
+    void inject(BoxAuth boxAuth);
 }

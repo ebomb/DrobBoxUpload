@@ -4,11 +4,8 @@ import android.os.AsyncTask;
 
 import com.box.androidsdk.content.BoxApiFile;
 import com.box.androidsdk.content.BoxException;
-import com.box.androidsdk.content.models.BoxFile;
-import com.box.androidsdk.content.requests.BoxRequestsFile;
 import com.dropbox.core.DbxException;
 import com.dropbox.core.v2.DbxClientV2;
-import com.dropbox.core.v2.files.FileMetadata;
 import com.dropbox.core.v2.files.WriteMode;
 
 import java.io.File;
@@ -25,7 +22,7 @@ public class UploadFileTask extends AsyncTask<String, Void, Void> {
 
     private DbxClientV2 mDropboxClient = null;
     private final Callback mCallback;
-    BoxApiFile mBoxApiFile;
+    private BoxApiFile mBoxApiFile;
     private Exception mException;
 
     // Handles callback from upload action
@@ -37,6 +34,7 @@ public class UploadFileTask extends AsyncTask<String, Void, Void> {
     // Constructor for Dropbox
     public UploadFileTask(DbxClientV2 dbxClient, Callback callback) {
         this.mDropboxClient = dbxClient;
+        this.mBoxApiFile = null;
         this.mCallback = callback;
     }
 

@@ -3,23 +3,19 @@ package com.demo.dropboxupload.activities;
 import android.content.Context;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
 import com.android.volley.RequestQueue;
 import com.demo.dropboxupload.R;
-import com.demo.dropboxupload.api.BoxAPI;
 import com.demo.dropboxupload.di.DemoApplication;
-import com.demo.dropboxupload.dialogs.BoxOAuthDialog;
-import com.demo.dropboxupload.interfaces.BoxAccessTokenCallback;
-import com.demo.dropboxupload.models.BoxAccess;
 import com.demo.dropboxupload.models.BoxAppData;
 import com.demo.dropboxupload.models.DropboxAppData;
 import com.demo.dropboxupload.models.translators.BoxAppDataTranslator;
 import com.demo.dropboxupload.models.translators.DropboxAppDataTranslator;
 import com.demo.dropboxupload.singletons.DropboxClientFactory;
 import com.demo.dropboxupload.utils.AppConstants;
+import com.demo.dropboxupload.utils.BoxAuth;
 import com.demo.dropboxupload.utils.Preferences;
 import com.dropbox.core.android.Auth;
 
@@ -86,9 +82,10 @@ public class LandingActivity extends BaseActivity {
     public void onBoxClick(View view) {
         UPLOAD_TYPE = UPLOAD_TYPE_BOX;
 
-        // Get Box Developer App details
-        final BoxAppData mBoxAppData = BoxAppDataTranslator.getBoxAppData(mContext);
+        // Begin OAuth Process
+        BoxAuth.createInstance(LandingActivity.this).beginOAuth();
 
+/*
         // Request Login and access to Box
         BoxOAuthDialog dialog = new BoxOAuthDialog(LandingActivity.this, mBoxAppData, new BoxOAuthDialog.BoxAuthCallback() {
             @Override
@@ -104,7 +101,7 @@ public class LandingActivity extends BaseActivity {
                         Preferences.setPreference(AppConstants.KEY_BOX_REFRESH_TOKEN, boxAccess.getAccessToken(), mContext);
 
                         // Start the Box upload process
-                        startFilesActivity(boxAccess.getAccessToken());
+                        startFilesActivity("");
                     }
 
                     @Override
@@ -120,16 +117,16 @@ public class LandingActivity extends BaseActivity {
 
             }
         });
-        dialog.show();
+        dialog.show();*/
     }
 
-    private void showMessage(String message) {
+    public void showMessage(String message) {
         if (!TextUtils.isEmpty(message)) {
             Toast.makeText(mContext, message, Toast.LENGTH_LONG).show();
         }
     }
 
-    private void startFilesActivity(String accessToken) {
+    public void startFilesActivity(String accessToken) {
         // Initiate Dropbox client object if necessary
         if (UPLOAD_TYPE == UPLOAD_TYPE_DROPBOX) {
             DropboxClientFactory.init(accessToken);

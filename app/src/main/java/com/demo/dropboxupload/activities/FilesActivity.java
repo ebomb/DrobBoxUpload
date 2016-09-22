@@ -13,7 +13,6 @@ import android.os.Bundle;
 import android.widget.Toast;
 
 import com.box.androidsdk.content.BoxApiFile;
-import com.box.androidsdk.content.models.BoxSession;
 import com.demo.dropboxupload.R;
 import com.demo.dropboxupload.async_tasks.UploadFileTask;
 import com.demo.dropboxupload.di.DemoApplication;
@@ -34,6 +33,7 @@ public class FilesActivity extends AppCompatActivity {
     String mPath;
 
     @Inject Context mContext;
+    @Inject BoxApiFile mBoxApiFile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,15 +104,15 @@ public class FilesActivity extends AppCompatActivity {
         displayProgressDialog(getString(R.string.uploading));
 
         // Start Upload Task
-        new UploadFileTask(new BoxApiFile(new BoxSession(mContext)), new UploadFileTask.Callback() {
+        new UploadFileTask(mBoxApiFile, new UploadFileTask.Callback() {
             @Override
             public void onUploadComplete() {
-
+                handleSuccessfulUpload();
             }
 
             @Override
             public void onError(Exception e) {
-
+                handleErrorUpload();
             }
         }).execute(filePath, mPath);
     }
@@ -138,7 +138,7 @@ public class FilesActivity extends AppCompatActivity {
     // Display success message and exit out of this Activity
     private void handleSuccessfulUpload() {
         dialog.dismiss();
-        Toast.makeText(mContext, R.string.uploaded, Toast.LENGTH_SHORT).show();
+        Toast.makeText(mContext, R.string.successfully_uploaded, Toast.LENGTH_LONG).show();
         exitActivity();
     }
 
