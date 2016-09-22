@@ -8,4 +8,5 @@
     <string name="read_access_denied">Can\'t upload file: read access denied. Please grant storage permissions to use this functionality.</string>
     <string name="uploaded">Uploaded</string>
     <string name="error_has_occurred">An error has occurred</string>
+    <string name="uploading">Uploading</string>
 </resources>

@@ -11,6 +11,11 @@ public class BoxAppData {
     private String clientID;
     private String clientSecret;
     private String redirectURI;
+    private String tokenURI;
+
+    public String getTokenURI() {
+        return tokenURI;
+    }
 
     public String getRedirectURI() {
         return redirectURI;
@@ -44,6 +49,10 @@ public class BoxAppData {
         this.redirectURI = redirectURI;
     }
 
+    public void setTokenURI(String tokenURI) {
+        this.tokenURI = tokenURI;
+    }
+
     public static class Keys {
         public static final String CLIENT_ID = "client_id";
         public static final String CLIENT_SECRET = "client_secret";
@@ -52,5 +61,8 @@ public class BoxAppData {
         public static final String CODE = "code";
         public static final String RESPONSE_TYPE = "response_type";
         public static final String STATE = "state";
+        public static final String TOKEN_URI = "token_uri";
+        public static final String GRANT_TYPE = "grant_type";
+        public static final String AUTHORIZATION_CODE = "authorization_code";
     }
 }

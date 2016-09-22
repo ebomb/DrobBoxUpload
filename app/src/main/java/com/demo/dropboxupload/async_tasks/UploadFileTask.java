@@ -2,6 +2,10 @@ package com.demo.dropboxupload.async_tasks;
 
 import android.os.AsyncTask;
 
+import com.box.androidsdk.content.BoxApiFile;
+import com.box.androidsdk.content.BoxException;
+import com.box.androidsdk.content.models.BoxFile;
+import com.box.androidsdk.content.requests.BoxRequestsFile;
 import com.dropbox.core.DbxException;
 import com.dropbox.core.v2.DbxClientV2;
 import com.dropbox.core.v2.files.FileMetadata;
@@ -17,33 +21,34 @@ import java.io.InputStream;
  * Async Task that uploads file to specified server
  */
 
-public class UploadFileTask extends AsyncTask<String, Void, FileMetadata> {
+public class UploadFileTask extends AsyncTask<String, Void, Void> {
 
     private DbxClientV2 mDropboxClient = null;
     private final Callback mCallback;
-    private Object mObject = null;
+    BoxApiFile mBoxApiFile;
     private Exception mException;
 
     // Handles callback from upload action
     public interface Callback {
-        void onUploadComplete(FileMetadata result);
+        void onUploadComplete();
         void onError(Exception e);
     }
 
     // Constructor for Dropbox
     public UploadFileTask(DbxClientV2 dbxClient, Callback callback) {
-        mDropboxClient = dbxClient;
-        mCallback = callback;
+        this.mDropboxClient = dbxClient;
+        this.mCallback = callback;
     }
 
     // Constructor for Box
-    public UploadFileTask(Object object, Callback callback) {
-        mObject = object;
-        mCallback = callback;
+    public UploadFileTask(BoxApiFile boxApiFile, Callback callback) {
+        this.mDropboxClient = null;
+        this.mBoxApiFile = boxApiFile;
+        this.mCallback = callback;
     }
 
     @Override
-    protected FileMetadata doInBackground(String... params) {
+    protected Void doInBackground(String... params) {
         // Get Image File
         String filePath = params[0];
         File localFile = new File(filePath);
@@ -55,30 +60,25 @@ public class UploadFileTask extends AsyncTask<String, Void, FileMetadata> {
         // Perform Upload Action
         try (InputStream inputStream = new FileInputStream(localFile)) {
             if (mDropboxClient != null) {
-                // DROPBOX
-                return mDropboxClient.files()
+                mDropboxClient.files()
                         .uploadBuilder(remoteFolderPath + "/" + remoteFileName)
                         .withMode(WriteMode.OVERWRITE)
                         .uploadAndFinish(inputStream);
-            } else if (mObject != null) {
-                // BOX
-                // TODO: Box.com upload
+            } else if (mBoxApiFile != null) {
+                mBoxApiFile.getUploadRequest(inputStream, remoteFileName, remoteFolderPath).send();
             }
-        } catch (DbxException | IOException e) {
+        } catch (DbxException | IOException | BoxException e) {
             mException = e;
         }
         return null;
     }
 
     @Override
-    protected void onPostExecute(FileMetadata result) {
-        super.onPostExecute(result);
+    protected void onPostExecute(Void result) {
         if (mException != null) {
             mCallback.onError(mException);
-        } else if (result == null) {
-            mCallback.onError(null);
         } else {
-            mCallback.onUploadComplete(result);
+            mCallback.onUploadComplete();
         }
     }
 }

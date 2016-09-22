@@ -24,6 +24,7 @@ public class BoxAppDataTranslator {
             boxAppData.setAuthURI(JSONHelper.getString(clientSecrets, BoxAppData.Keys.AUTH_URI));
             boxAppData.setClientID(JSONHelper.getString(clientSecrets, BoxAppData.Keys.CLIENT_ID));
             boxAppData.setClientSecret(JSONHelper.getString(clientSecrets, BoxAppData.Keys.CLIENT_SECRET));
+            boxAppData.setTokenURI(JSONHelper.getString(clientSecrets, BoxAppData.Keys.TOKEN_URI));
             boxAppData.setRedirectURI(JSONHelper.getString(clientSecrets, BoxAppData.Keys.REDIRECT_URI));
         } catch (Throwable e) {
             e.printStackTrace();

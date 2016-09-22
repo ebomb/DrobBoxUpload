@@ -10,15 +10,15 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Toast;
 
+import com.box.androidsdk.content.BoxApiFile;
+import com.box.androidsdk.content.models.BoxSession;
 import com.demo.dropboxupload.R;
 import com.demo.dropboxupload.async_tasks.UploadFileTask;
 import com.demo.dropboxupload.di.DemoApplication;
 import com.demo.dropboxupload.singletons.DropboxClientFactory;
 import com.demo.dropboxupload.utils.FileUtils;
-import com.dropbox.core.v2.files.FileMetadata;
 
 import javax.inject.Inject;
 
@@ -29,8 +29,9 @@ public class FilesActivity extends AppCompatActivity {
 
     private static final String EXTRA_PATH = "EXTRA_PATH", UPLOAD_TYPE = "UPLOAD_TYPE";
     private static final int PICKFILE_REQUEST_CODE = 1;
-    String mPath;
+    ProgressDialog dialog;
     int uploadType;
+    String mPath;
 
     @Inject Context mContext;
 
@@ -83,15 +84,11 @@ public class FilesActivity extends AppCompatActivity {
         }
     }
 
-    private void uploadBoxFile(String filePath) {
-
-    }
-
     @Override
     public void onRequestPermissionsResult(int actionCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         // CHECK IF USER HAS GIVEN AUTH
-        for (int i = 0; i < grantResults.length; ++i) {
-            if (grantResults[i] == PackageManager.PERMISSION_DENIED) {
+        for (int grantResult : grantResults) {
+            if (grantResult == PackageManager.PERMISSION_DENIED) {
                 Toast.makeText(this, R.string.read_access_denied, Toast.LENGTH_LONG).show();
                 exitActivity();
                 return;
@@ -102,35 +99,63 @@ public class FilesActivity extends AppCompatActivity {
         launchFilePicker();
     }
 
-    // Performs the upload action to Dropbox
-    private void uploadDropboxFile(String filePath) {
-        // Display Uploading Message
-        final ProgressDialog dialog = new ProgressDialog(this);
-        dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        dialog.setCancelable(false);
-        dialog.setMessage("Uploading");
-        dialog.show();
+    // Performs the upload action to Box
+    private void uploadBoxFile(String filePath) {
+        displayProgressDialog(getString(R.string.uploading));
 
         // Start Upload Task
-        new UploadFileTask(DropboxClientFactory.getClient(), new UploadFileTask.Callback() {
+        new UploadFileTask(new BoxApiFile(new BoxSession(mContext)), new UploadFileTask.Callback() {
             @Override
-            public void onUploadComplete(FileMetadata result) {
-                dialog.dismiss();
-//                String message = result.getName() + " size " + result.getSize() + " modified " +
-//                        DateFormat.getDateTimeInstance().format(result.getClientModified());
-//                Log.d("Success", message);
-                Toast.makeText(mContext, R.string.uploaded, Toast.LENGTH_SHORT).show();
-                exitActivity();
+            public void onUploadComplete() {
+
             }
 
             @Override
             public void onError(Exception e) {
-                dialog.dismiss();
-//                Log.d("ERROR!", "Failed to upload file " + e);
-                Toast.makeText(mContext, R.string.error_has_occurred, Toast.LENGTH_SHORT).show();
-                exitActivity();
+
             }
         }).execute(filePath, mPath);
+    }
+
+    // Performs the upload action to Dropbox
+    private void uploadDropboxFile(String filePath) {
+        displayProgressDialog(getString(R.string.uploading));
+
+        // Start Upload Task
+        new UploadFileTask(DropboxClientFactory.getClient(), new UploadFileTask.Callback() {
+            @Override
+            public void onUploadComplete() {
+                handleSuccessfulUpload();
+            }
+
+            @Override
+            public void onError(Exception e) {
+                handleErrorUpload();
+            }
+        }).execute(filePath, mPath);
+    }
+
+    // Display success message and exit out of this Activity
+    private void handleSuccessfulUpload() {
+        dialog.dismiss();
+        Toast.makeText(mContext, R.string.uploaded, Toast.LENGTH_SHORT).show();
+        exitActivity();
+    }
+
+    // Display error message and exit out of this Activity
+    private void handleErrorUpload() {
+        dialog.dismiss();
+        Toast.makeText(mContext, R.string.error_has_occurred, Toast.LENGTH_SHORT).show();
+        exitActivity();
+    }
+
+    // Display progress dialog with custom message
+    private void displayProgressDialog(String message) {
+        dialog = new ProgressDialog(FilesActivity.this);
+        dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        dialog.setCancelable(false);
+        dialog.setMessage(message);
+        dialog.show();
     }
 
     // Creates the launching intent for this Activity
