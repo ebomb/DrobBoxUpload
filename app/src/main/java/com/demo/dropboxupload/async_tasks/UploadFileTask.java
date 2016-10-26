@@ -3,6 +3,7 @@ package com.demo.dropboxupload.async_tasks;
 import android.annotation.TargetApi;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.text.TextUtils;
 
 import com.box.androidsdk.content.BoxApiFile;
 import com.box.androidsdk.content.BoxException;
@@ -26,6 +27,7 @@ public class UploadFileTask extends AsyncTask<String, Void, Void> {
     private final Callback mCallback;
     private BoxApiFile mBoxApiFile;
     private Exception mException;
+    private String error_no_file = "Couldn't retrieve file from device";
 
     // Handles callback from upload action
     public interface Callback {
@@ -52,24 +54,28 @@ public class UploadFileTask extends AsyncTask<String, Void, Void> {
     protected Void doInBackground(String... params) {
         // Get Image File
         String filePath = params[0];
-        File localFile = new File(filePath);
+        if (!TextUtils.isEmpty(filePath)) {
+            File localFile = new File(filePath);
 
-        // Get File Path & Name
-        String remoteFolderPath = params[1];
-        String remoteFileName = localFile.getName();
+            // Get File Path & Name
+            String remoteFolderPath = params[1];
+            String remoteFileName = localFile.getName();
 
-        // Perform Upload Action
-        try (InputStream inputStream = new FileInputStream(localFile)) {
-            if (mDropboxClient != null) {
-                mDropboxClient.files()
-                        .uploadBuilder(remoteFolderPath + "/" + remoteFileName)
-                        .withMode(WriteMode.OVERWRITE)
-                        .uploadAndFinish(inputStream);
-            } else if (mBoxApiFile != null) {
-                mBoxApiFile.getUploadRequest(inputStream, remoteFileName, remoteFolderPath).send();
+            // Perform Upload Action
+            try (InputStream inputStream = new FileInputStream(localFile)) {
+                if (mDropboxClient != null) {
+                    mDropboxClient.files()
+                            .uploadBuilder(remoteFolderPath + "/" + remoteFileName)
+                            .withMode(WriteMode.OVERWRITE)
+                            .uploadAndFinish(inputStream);
+                } else if (mBoxApiFile != null) {
+                    mBoxApiFile.getUploadRequest(inputStream, remoteFileName, remoteFolderPath).send();
+                }
+            } catch (DbxException | IOException | BoxException e) {
+                mException = e;
             }
-        } catch (DbxException | IOException | BoxException e) {
-            mException = e;
+        } else {
+            mException = new Exception(error_no_file);
         }
         return null;
     }

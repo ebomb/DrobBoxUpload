@@ -1,9 +1,7 @@
 package com.demo.dropboxupload.activities;
 
 import android.Manifest;
-import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
@@ -11,6 +9,8 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.box.androidsdk.content.BoxApiFile;
@@ -22,19 +22,21 @@ import com.demo.dropboxupload.utils.FileUtils;
 
 import javax.inject.Inject;
 
+import static com.demo.dropboxupload.activities.LandingActivity.UPLOAD_TYPE;
 import static com.demo.dropboxupload.utils.AppConstants.UPLOAD_TYPE_BOX;
 import static com.demo.dropboxupload.utils.AppConstants.UPLOAD_TYPE_DROPBOX;
 
 public class FilesActivity extends AppCompatActivity {
 
-    private static final String EXTRA_PATH = "EXTRA_PATH", UPLOAD_TYPE = "UPLOAD_TYPE";
+    private static final String EXTRA_PATH = "EXTRA_PATH", KEY_UPLOAD_TYPE = "KEY_UPLOAD_TYPE";
     private static final int PICKED_FILE_REQUEST_CODE = 1;
-    ProgressDialog dialog;
     int uploadType;
     String mFolderName;
 
     @Inject Context mContext;
     @Inject BoxApiFile mBoxApiFile;
+
+    ProgressBar dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,7 +44,9 @@ public class FilesActivity extends AppCompatActivity {
         setContentView(R.layout.activity_file_picker);
         ((DemoApplication) getApplication()).component().inject(this);  // Inject dependencies
         mFolderName = getIntent().getStringExtra(EXTRA_PATH);
-        uploadType = getIntent().getIntExtra(UPLOAD_TYPE, 0);
+        uploadType = getIntent().getIntExtra(KEY_UPLOAD_TYPE, 0);
+        dialog = (ProgressBar) findViewById(R.id.fp_progress_bar);
+        UPLOAD_TYPE = 0;
         performWithPermissions(FileAction.UPLOAD);
     }
 
@@ -102,7 +106,8 @@ public class FilesActivity extends AppCompatActivity {
 
     // Performs the upload action to Box
     private void uploadBoxFile(String filePath) {
-        displayProgressDialog(getString(R.string.uploading));
+        Toast.makeText(mContext, R.string.uploading, Toast.LENGTH_SHORT).show();
+        dialog.setVisibility(View.VISIBLE);
 
         // Start Upload Task
         new UploadFileTask(mBoxApiFile, new UploadFileTask.Callback() {
@@ -120,7 +125,8 @@ public class FilesActivity extends AppCompatActivity {
 
     // Performs the upload action to Dropbox
     private void uploadDropboxFile(String filePath) {
-        displayProgressDialog(getString(R.string.uploading));
+        Toast.makeText(mContext, R.string.uploading, Toast.LENGTH_SHORT).show();
+        dialog.setVisibility(View.VISIBLE);
 
         // Start Upload Task
         new UploadFileTask(DropboxClientFactory.getClient(), new UploadFileTask.Callback() {
@@ -138,48 +144,29 @@ public class FilesActivity extends AppCompatActivity {
 
     // Display success message and exit out of this Activity
     private void handleSuccessfulUpload() {
-        if (dialog != null) {
-            dialog.dismiss();
-        }
+        dialog.setVisibility(View.GONE);
         Toast.makeText(mContext, R.string.successfully_uploaded, Toast.LENGTH_LONG).show();
         exitActivity();
     }
 
     // Display error message and exit out of this Activity
     private void handleErrorUpload() {
-        if (dialog != null) {
-            dialog.dismiss();
-        }
+        dialog.setVisibility(View.GONE);
         Toast.makeText(mContext, R.string.error_has_occurred, Toast.LENGTH_SHORT).show();
         exitActivity();
-    }
-
-    // Display progress dialog with custom message
-    private void displayProgressDialog(String message) {
-        dialog = new ProgressDialog(FilesActivity.this);
-        dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        dialog.setCancelable(true);
-        dialog.setMessage(message);
-        dialog.show();
-        dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-            @Override
-            public void onDismiss(DialogInterface dialog) {
-                exitActivity();
-            }
-        });
     }
 
     // Creates the launching intent for this Activity
     public static Intent getIntent(Context context, String path, int uploadType) {
         Intent filesIntent = new Intent(context, FilesActivity.class);
         filesIntent.putExtra(FilesActivity.EXTRA_PATH, path);
-        filesIntent.putExtra(FilesActivity.UPLOAD_TYPE, uploadType);
+        filesIntent.putExtra(FilesActivity.KEY_UPLOAD_TYPE, uploadType);
         return filesIntent;
     }
 
     // Safely exits out of this Activity
     private void exitActivity() {
-        LandingActivity.UPLOAD_TYPE = -1;
+        UPLOAD_TYPE = 0;
         if (!isFinishing()) {
             finish();
         }
